@@ -1,6 +1,6 @@
 </$objtype/mkfile
 
-TARG=awk
+TARG=kwa
 OFILES=re.$O\
 	lex.$O\
 	main.$O\
