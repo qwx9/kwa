@@ -1,9 +1,3 @@
-/*
-Copyright (c) Lucent Technologies 1997
-	All Rights Reserved
-
-*/
-
 typedef double	Awkfloat;
 
 #define	xfree(a)	{ if ((a) != nil) { free((a)); (a) = nil; } }
