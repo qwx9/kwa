@@ -121,10 +121,8 @@ int getrec(char **pbuf, int *pbufsize, int isrecord)	/* get next input record */
 					xfree(fldtab[0]->sval);
 				fldtab[0]->sval = buf;	/* buf == record */
 				fldtab[0]->tval = REC | STR | DONTFREE;
-				if (is_number(fldtab[0]->sval)) {
-					fldtab[0]->fval = atof(fldtab[0]->sval);
+				if (to_number(fldtab[0]->sval, &fldtab[0]->fval))
 					fldtab[0]->tval |= NUM;
-				}
 			}
 			setfval(nrloc, nrloc->fval+1);
 			setfval(fnrloc, fnrloc->fval+1);
@@ -213,10 +211,8 @@ void setclvar(char *s)	/* set var=value from s */
 	p = qstring(p, '\0');
 	q = setsymtab(s, p, 0.0, STR, symtab);
 	setsval(q, p);
-	if (is_number(q->sval)) {
-		q->fval = atof(q->sval);
+	if (to_number(q->sval, &q->fval))
 		q->tval |= NUM;
-	}
 	   dprint( ("command line set %s to |%s|\n", s, p) );
 }
 
@@ -305,10 +301,8 @@ void fldbld(void)	/* create fields from current record */
 	donefld = 1;
 	for (j = 1; j <= lastfld; j++) {
 		p = fldtab[j];
-		if(is_number(p->sval)) {
-			p->fval = atof(p->sval);
+		if (to_number(p->sval, &p->fval))
 			p->tval |= NUM;
-		}
 	}
 	setfval(nfloc, (Awkfloat) lastfld);
 	if (dbg) {
@@ -643,7 +637,7 @@ int isclvar(char *s)	/* is s of form var=something ? */
 
 /* strtod is supposed to be a proper test of what's a valid number */
 
-int is_number(char *s)
+int to_number(char *s, Awkfloat *fp)
 {
 	double r;
 	char *ep;
@@ -674,6 +668,8 @@ int is_number(char *s)
 	}
 
 	r = strtod(s, &ep);
+	if (fp != nil)	/* relied upon by getfval */
+		*fp = r;
 	if (ep == s || isInf(r, 1) || isInf(r, -1) || isNaN(r))
 		return 0;
 	while (*ep == ' ' || *ep == '\t' || *ep == '\n')
