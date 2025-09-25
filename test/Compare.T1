@@ -1,6 +1,6 @@
 #!/bin/rc
 rfork e
-oldawk=trueawk
+oldawk=awk
 awk=kwa
 
 for(i in T.*)
