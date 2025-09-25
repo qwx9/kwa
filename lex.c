@@ -446,7 +446,7 @@ int word(char *w)
 				SYNTAX( "return not in function" );
 			RET(kp->type);
 		case VARNF:
-			yylval.cp = setsymtab("NF", EMPTY, 0.0, NUM, symtab);
+			yylval.cp = nfloc;
 			RET(VARNF);
 		default:
 			RET(kp->type);
