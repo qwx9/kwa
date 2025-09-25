@@ -1,0 +1,37 @@
+#!/bin/rc
+echo T.redir: test redirections
+
+$awk '{ print >"foo" }' /lib/theo
+diff foo /lib/theo || echo 'BAD: T.redir (print >"foo")'
+
+rm -f foo
+$awk '{ print >>"foo" }' /lib/theo
+diff foo /lib/theo || echo 'BAD: T.redir (print >>"foo")'
+
+rm -f foo
+$awk 'NR%2 == 1 { print >>"foo" }
+      NR%2 == 0 { print >"foo" }' /lib/theo
+diff foo /lib/theo || echo 'BAD: T.redir (print > and >>"foo")'
+
+rm -f foo
+$awk '{ print | "cat >foo" }' /lib/theo
+diff foo /lib/theo || echo 'BAD: T.redir (print | "cat >foo")'
+
+# tests flush of stdout before opening pipe
+echo '   head
+1
+2' >foo1
+$awk 'BEGIN { print "   head"
+	for (i = 1; i < 3; i++)
+		print i | "sort" }' >foo2
+diff foo1 foo2 || echo 'BAD: T.redir (buffering)'
+
+rm -f foo[12]
+$awk '{ print >"/fd/2" }' /lib/theo >foo1 >[2]foo2
+diff foo2 /lib/theo || echo 'BAD: T.redir (print >"/fd/2")'
+diff foo1 /dev/null  || echo 'BAD: T.redir (print >"/fd/2")'
+
+rm -f foo[12]
+$awk '{ print >"/fd/1" }' /lib/theo >foo1 >[2]foo2
+diff foo1 /lib/theo || echo 'BAD: T.redir (print >"/fd/1")'
+diff foo2 /dev/null  || echo 'BAD: T.redir (print >"/fd/2")'
