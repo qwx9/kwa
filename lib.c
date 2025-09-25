@@ -121,7 +121,7 @@ int getrec(char **pbuf, int *pbufsize, int isrecord)	/* get next input record */
 					xfree(fldtab[0]->sval);
 				fldtab[0]->sval = buf;	/* buf == record */
 				fldtab[0]->tval = REC | STR | DONTFREE;
-				if (to_number(fldtab[0]->sval, &fldtab[0]->fval))
+				if (to_number(fldtab[0]->sval, &fldtab[0]->fval, nil))
 					fldtab[0]->tval |= NUM;
 			}
 			setfval(nrloc, nrloc->fval+1);
@@ -211,7 +211,7 @@ void setclvar(char *s)	/* set var=value from s */
 	p = qstring(p, '\0');
 	q = setsymtab(s, p, 0.0, STR, symtab);
 	setsval(q, p);
-	if (to_number(q->sval, &q->fval))
+	if (to_number(q->sval, &q->fval, nil))
 		q->tval |= NUM;
 	   dprint( ("command line set %s to |%s|\n", s, p) );
 }
@@ -301,7 +301,7 @@ void fldbld(void)	/* create fields from current record */
 	donefld = 1;
 	for (j = 1; j <= lastfld; j++) {
 		p = fldtab[j];
-		if (to_number(p->sval, &p->fval))
+		if (to_number(p->sval, &p->fval, nil))
 			p->tval |= NUM;
 	}
 	setfval(nfloc, (Awkfloat) lastfld);
@@ -635,12 +635,14 @@ int isclvar(char *s)	/* is s of form var=something ? */
 	return *s == '=' && s > os && *(s+1) != '=';
 }
 
-static int is_float(char *s, Awkfloat *fp)
+static int is_float(char *s, Awkfloat *fp, char **tp)
 {
 	char c, *p, *q;
 	Awkfloat f;
 
 	f = *fp = strtod(s, &p);
+	if (tp != nil)
+		*tp = p;
 	if (p == s)
 		return 0;
 	else if (isInf(f, 1) || isInf(f, -1) || isNaN(f))
@@ -665,13 +667,15 @@ static int is_float(char *s, Awkfloat *fp)
 	return 1;
 }
 
-int to_number(char *s, Awkfloat *fp)
+int to_number(char *s, Awkfloat *fp, char **tp)
 {
 	vlong v;
 	char *p, *q;
 
 	v = strtoll(s, &p, 0);
 	*fp = (Awkfloat)v;
+	if (tp != nil)
+		*tp = p;
 	switch(*p){
 	case '.':
 	case 'E':
@@ -680,7 +684,7 @@ int to_number(char *s, Awkfloat *fp)
 	case 'e':
 	case 'i':
 	case 'n':
-		if (is_float(s, fp))
+		if (is_float(s, fp, tp))
 			return NUM;
 		return 0;
 	case '\0':

@@ -79,7 +79,7 @@ int peek(void)
 	return c;
 }
 
-int gettok(char **pbuf, int *psz)	/* get next input token */
+static int gettok(char **pbuf, int *psz, Awkfloat *fp)	/* get next input token */
 {
 	int c;
 	char *buf = *pbuf;
@@ -108,6 +108,7 @@ int gettok(char **pbuf, int *psz)	/* get next input token */
 				break;
 			}
 		}
+		c = 'a';
 	} else {	/* it's a number */
 		char *rem;
 		/* read input until can't be a number */
@@ -124,13 +125,14 @@ int gettok(char **pbuf, int *psz)	/* get next input token */
 			}
 		}
 		*bp = 0;
-		strtod(buf, &rem);	/* parse the number */
+		to_number(buf, fp, &rem);	/* parse the number */
 		unputstr(rem);		/* put rest back for later */
 		rem[0] = 0;
+		c = '0';
 	}
 	*pbuf = buf;
 	*psz = sz;
-	return buf[0];
+	return c;
 }
 
 int	word(char *);
@@ -142,6 +144,7 @@ int	reg	= 0;	/* 1 => return a REGEXPR now */
 int yylex(void)
 {
 	int c;
+	Awkfloat f;
 	static char *buf = 0;
 	static int bufsize = 500;
 
@@ -156,14 +159,14 @@ int yylex(void)
 		return regexpr();
 	}
 	for (;;) {
-		c = gettok(&buf, &bufsize);
+		c = gettok(&buf, &bufsize, &f);
 		if (c == 0)
 			return 0;
-		if (isalpha(c) || c == '_')
+		if (c == 'a')
 			return word(buf);
-		if (isdigit(c) || c == '.') {
-			yylval.cp = setsymtab(buf, tostring(buf), atof(buf), CON|NUM, symtab);
-			/* should this also have STR set? */
+		if (c == '0') {
+			yylval.cp = setsymtab(buf, tostring(buf), f, CON|NUM, symtab);
+			/* should this also have STR set? */	/* FIXME: yes. */
 			RET(NUMBER);
 		}
 	
@@ -273,7 +276,7 @@ int yylex(void)
 	
 		case '$':
 			/* BUG: awkward, if not wrong */
-			c = gettok(&buf, &bufsize);
+			c = gettok(&buf, &bufsize, &f);
 			if (c == '(' || c == '[' || (infunc && isarg(buf) >= 0)) {
 				unputstr(buf);
 				RET(INDIRECT);

@@ -93,7 +93,7 @@ extern	void	eprint(void);
 extern	void	bclass(int);
 extern	double	errcheck(double, char *);
 extern	int	isclvar(char *);
-extern	int	to_number(char *, Awkfloat *);
+extern	int	to_number(char *, Awkfloat *, char **);
 
 extern	int	adjbuf(char **pb, int *sz, int min, int q, char **pbp, char *what);
 extern	void	run(Node *);

@@ -405,7 +405,7 @@ Cell *getline(Node **a, int n)	/* get next line from specific input */
 				tfree(x);
 		} else {			/* getline <file */
 			setsval(fldtab[0], buf);
-			if (to_number(fldtab[0]->sval, &fldtab[0]->fval))
+			if (to_number(fldtab[0]->sval, &fldtab[0]->fval, nil))
 				fldtab[0]->tval |= NUM;
 		}
 	} else {			/* bare getline; use current input */
@@ -711,7 +711,7 @@ Cell *indirect(Node **a, int)	/* $( a[0] ) */
 	x = execute(a[0]);
 	m = (int) getfval(x);
 	if (m == 0) {
-		if (!to_number(s = getsval(x), &x->fval))	/* suspicion! */
+		if (!to_number(s = getsval(x), &x->fval, nil))	/* suspicion! */
 			FATAL("illegal field $(%s), name \"%s\"", s, x->nval);
 			/* BUG: can x->nval ever be null??? */
 	}
@@ -1280,7 +1280,7 @@ Cell *split(Node **a, int)	/* split(a[0], a[1], a[2]); a[3] is type */
 				sprint(num, "%d", n);
 				temp = *patbeg;
 				*patbeg = '\0';
-				if (to_number(t, &f))
+				if (to_number(t, &f, nil))
 					setsymtab(num, t, f, STR|NUM, (Array *) ap->sval);
 				else
 					setsymtab(num, t, 0.0, STR, (Array *) ap->sval);
@@ -1296,7 +1296,7 @@ Cell *split(Node **a, int)	/* split(a[0], a[1], a[2]); a[3] is type */
 		}
 		n++;
 		sprint(num, "%d", n);
-		if (to_number(t, &f))
+		if (to_number(t, &f, nil))
 			setsymtab(num, t, f, STR|NUM, (Array *) ap->sval);
 		else
 			setsymtab(num, t, 0.0, STR, (Array *) ap->sval);
@@ -1317,7 +1317,7 @@ Cell *split(Node **a, int)	/* split(a[0], a[1], a[2]); a[3] is type */
 			temp = *s;
 			*s = '\0';
 			sprint(num, "%d", n);
-			if (to_number(t, &f))
+			if (to_number(t, &f, nil))
 				setsymtab(num, t, f, STR|NUM, (Array *) ap->sval);
 			else
 				setsymtab(num, t, 0.0, STR, (Array *) ap->sval);
@@ -1349,7 +1349,7 @@ Cell *split(Node **a, int)	/* split(a[0], a[1], a[2]); a[3] is type */
 			temp = *s;
 			*s = '\0';
 			sprint(num, "%d", n);
-			if (to_number(t, &f))
+			if (to_number(t, &f, nil))
 				setsymtab(num, t, f, STR|NUM, (Array *) ap->sval);
 			else
 				setsymtab(num, t, 0.0, STR, (Array *) ap->sval);

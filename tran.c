@@ -82,7 +82,7 @@ void arginit(int ac, char **av)	/* set up ARGV and ARGC */
 	cp->sval = (char *) ARGVtab;
 	for (i = 0; i < ac; i++) {
 		sprint(temp, "%d", i);
-		if (to_number(*av, &f))
+		if (to_number(*av, &f, nil))
 			setsymtab(temp, *av, f, STR|NUM, ARGVtab);
 		else
 			setsymtab(temp, *av, 0.0, STR, ARGVtab);
@@ -109,7 +109,7 @@ void envinit(void)	/* set up ENVIRON variable */
 				continue;
 			if ((v = getenv(k)) == nil)
 				continue;
-			if (to_number(v, &f))
+			if (to_number(v, &f, nil))
 				setsymtab(k, v, f, STR|NUM, ENVtab);
 			else
 				setsymtab(k, v, 0.0, STR, ENVtab);
@@ -336,7 +336,7 @@ Awkfloat getfval(Cell *vp)	/* get float val of a Cell */
 		recbld();
 	if (!isnum(vp)) {	/* not a number */
 		vp->fval = 0;
-		if (to_number(vp->sval, &vp->fval)) {
+		if (to_number(vp->sval, &vp->fval, nil)) {
 			if (!(vp->tval&CON))
 				vp->tval |= NUM;	/* make NUM only sparingly */
 		}
