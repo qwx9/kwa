@@ -1,4 +1,4 @@
-char	*version = "version 19990602";
+char	*version = "version 20250925";
 
 #include <u.h>
 #include <libc.h>
