@@ -1335,8 +1335,8 @@ Cell *split(Node **a, int)	/* split(a[0], a[1], a[2]); a[3] is type */
 			nb = chartorune(&r, s);
 			memmove(buf, s, nb);
 			buf[nb] = '\0';
-			if (isdigit(buf[0]))
-				setsymtab(num, buf, atof(buf), STR|NUM, (Array *) ap->sval);
+			if (to_number(buf, &f, nil))
+				setsymtab(num, buf, f, STR|NUM, (Array *) ap->sval);
 			else
 				setsymtab(num, buf, 0.0, STR, (Array *) ap->sval);
 		}
