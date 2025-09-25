@@ -635,47 +635,74 @@ int isclvar(char *s)	/* is s of form var=something ? */
 	return *s == '=' && s > os && *(s+1) != '=';
 }
 
-/* strtod is supposed to be a proper test of what's a valid number */
+static int is_float(char *s, Awkfloat *fp)
+{
+	char c, *p, *q;
+	Awkfloat f;
+
+	f = *fp = strtod(s, &p);
+	if (p == s)
+		return 0;
+	else if (isInf(f, 1) || isInf(f, -1) || isNaN(f))
+		return 0;
+	else if (f == 0.0 && ((q = strchr(s, '0')) == nil || q > p))
+		return 0;
+	for (; (c = *p) != '\0'; p++) {
+		switch(c) {
+		case ' ':
+		case '\t':
+		case '\n':
+		case '\f':
+		case '\r':
+		case '\v':
+			continue;
+		case '\0':
+			return 1;
+		default:
+			return 0;
+		}
+	}
+	return 1;
+}
 
 int to_number(char *s, Awkfloat *fp)
 {
-	double r;
-	char *ep;
+	vlong v;
+	char *p, *q;
 
-	/*
-	 * fast could-it-be-a-number check before calling strtod,
-	 * which takes a surprisingly long time to reject non-numbers.
-	 */
-	switch (*s) {
-	case '0': case '1': case '2': case '3': case '4':
-	case '5': case '6': case '7': case '8': case '9':
-	case '\t':
-	case '\n':
-	case '\v':
-	case '\f':
-	case '\r':
-	case ' ':
-	case '-':
-	case '+':
+	v = strtoll(s, &p, 0);
+	*fp = (Awkfloat)v;
+	switch(*p){
 	case '.':
-	case 'n':		/* nans */
-	case 'N':
-	case 'i':		/* infs */
-	case 'I':
+	case 'E':
+	case 'I':	/* inf */
+	case 'N':	/* nan */
+	case 'e':
+	case 'i':
+	case 'n':
+		if (is_float(s, fp))
+			return NUM;
+		return 0;
+	case '\0':
+		if (p == s)
+			return 0;
+		else if (v != 0 || (q = strchr(s, '0')) != nil && q < p)
+			return NUM;
 		break;
-	default:
-		return 0;	/* can't be a number */
 	}
-
-	r = strtod(s, &ep);
-	if (fp != nil)	/* relied upon by getfval */
-		*fp = r;
-	if (ep == s || isInf(r, 1) || isInf(r, -1) || isNaN(r))
-		return 0;
-	while (*ep == ' ' || *ep == '\t' || *ep == '\n')
-		ep++;
-	if (*ep == '\0')
-		return 1;
-	else
-		return 0;
+	for (;; p++) {
+		switch(*p) {
+		case ' ':
+		case '\t':
+		case '\n':
+		case '\f':
+		case '\r':
+		case '\v':
+			continue;
+		case '\0':
+			return NUM;
+		default:
+			return 0;
+		}
+	}
 }
