@@ -1516,13 +1516,15 @@ Cell *bltin(Node **a, int)	/* builtin functions. a[0] is type, a[1] is arg list 
 {
 	Cell *x, *y;
 	Awkfloat u, tmp;
-	int t;
+	int n, t;
 	Rune wc;
-	char *p, *buf;
+	char *p, *s, *buf, *rbuf;
 	char mbc[50];
 	Node *nextarg;
 	Biobuf *fp;
 	void flush_all(void);
+	int (*test)(Rune);
+	Rune (*conv)(Rune);
 
 	t = ptoi(a[0]);
 	x = execute(a[1]);
@@ -1578,21 +1580,29 @@ Cell *bltin(Node **a, int)	/* builtin functions. a[0] is type, a[1] is arg list 
 		break;
 	case FTOUPPER:
 	case FTOLOWER:
-		buf = tostring(getsval(x));
+		buf = getsval(x);
+		n = utflen(buf) * UTFmax + 1;	/* just in case size differs... */
+		if ((rbuf = malloc(n)) == nil)
+			FATAL("out of space in %s", t == FTOUPPER ? "toupper" : "tolower");
 		if (t == FTOUPPER) {
-			for (p = buf; *p; p++)
-				if (islower(*p))
-					*p = toupper(*p);
+			test = islowerrune;
+			conv = toupperrune;
 		} else {
-			for (p = buf; *p; p++)
-				if (isupper(*p))
-					*p = tolower(*p);
+			test = isupperrune;
+			conv = tolowerrune;
 		}
+		for (p = rbuf, s = buf; *s; s += n) {
+			n = chartorune(&wc, s);
+			if (test(wc))
+				wc = conv(wc);
+			p += runetochar(p, &wc);
+		}
+		*p = 0;
 		if (istemp(x))
 			tfree(x);
 		x = gettemp();
-		setsval(x, buf);
-		free(buf);
+		setsval(x, rbuf);
+		free(rbuf);
 		return x;
 	case FFLUSH:
 		if (isrec(x) || strlen(getsval(x)) == 0) {
