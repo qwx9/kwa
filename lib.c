@@ -6,7 +6,7 @@
 #include "y.tab.h"
 
 Biobuf	*infile;
-char	*file	= "";
+char	*file	= EMPTY;
 char	*record;
 int	recsize	= RECSIZE;
 char	*fields;
@@ -25,8 +25,8 @@ int	lastfld	= 0;	/* last used field */
 int	argno	= 1;	/* current input argument number */
 extern	Awkfloat *AARGC;
 
-static Cell dollar0 = { OCELL, CFLD, nil, "", 0.0, REC|STR|DONTFREE };
-static Cell dollar1 = { OCELL, CFLD, nil, "", 0.0, FLD|STR|DONTFREE };
+static Cell dollar0 = { OCELL, CFLD, nil, EMPTY, 0.0, REC|STR|DONTFREE };
+static Cell dollar1 = { OCELL, CFLD, nil, EMPTY, 0.0, FLD|STR|DONTFREE };
 
 void recinit(unsigned int n)
 {
@@ -194,7 +194,7 @@ char *getargv(int n)	/* get ARGV[n] */
 	extern Array *ARGVtab;
 
 	sprint(temp, "%d", n);
-	x = setsymtab(temp, "", 0.0, STR, ARGVtab);
+	x = setsymtab(temp, EMPTY, 0.0, STR, ARGVtab);
 	s = getsval(x);
 	dprint( ("getargv(%d) returns |%s|\n", n, s) );
 	return s;
@@ -322,7 +322,7 @@ void cleanfld(int n1, int n2)	/* clean out fields n1 .. n2 inclusive */
 		p = fldtab[i];
 		if (freeable(p))
 			xfree(p->sval);
-		p->sval = "";
+		p->sval = EMPTY;
 		p->tval = FLD | STR | DONTFREE;
 	}
 }

@@ -28,7 +28,7 @@ static Cell	exitcell	={ OJUMP, JEXIT, 0, 0, 0.0, NUM };
 Cell	*jexit	= &exitcell;
 static Cell	retcell		={ OJUMP, JRET, 0, 0, 0.0, NUM };
 Cell	*jret	= &retcell;
-static Cell	tempcell	={ OCELL, CTEMP, 0, "", 0.0, NUM|STR|DONTFREE };
+static Cell	tempcell	={ OCELL, CTEMP, 0, EMPTY, 0.0, NUM|STR|DONTFREE };
 
 Node	*curnode = nil;	/* the node being executed, for debugging */
 
@@ -200,7 +200,7 @@ struct Frame *fp = nil;	/* frame pointer. bottom level unused */
 
 Cell *call(Node **a, int)	/* function call.  very kludgy and fragile */
 {
-	static Cell newcopycell = { OCELL, CCOPY, 0, "", 0.0, NUM|STR|DONTFREE };
+	static Cell newcopycell = { OCELL, CCOPY, 0, EMPTY, 0.0, NUM|STR|DONTFREE };
 	int i, ncall, ndef;
 	Node *x;
 	Cell *args[NARGS], *oargs[NARGS];	/* BUG: fixed size arrays */
@@ -304,10 +304,11 @@ Cell *copycell(Cell *x)	/* make a copy of a cell in a temp */
 	y = gettemp();
 	y->csub = CCOPY;	/* prevents freeing until call is over */
 	y->nval = x->nval;	/* BUG? */
-	y->sval = x->sval ? tostring(x->sval) : nil;
+	y->sval = x->sval != nil && x->sval != EMPTY ? tostring(x->sval) : EMPTY;
 	y->fval = x->fval;
 	y->tval = x->tval & ~(CON|FLD|REC|DONTFREE);	/* copy is not constant or field */
-							/* is DONTFREE right? */
+	if (y->sval == EMPTY)
+		y->tval |= DONTFREE;
 	return y;
 }
 
@@ -466,7 +467,7 @@ Cell *array(Node **a, int)	/* a[0] is symtab, a[1] is list of subscripts */
 		x->tval |= ARR;
 		x->sval = (char *) makesymtab(NSYMTAB);
 	}
-	z = setsymtab(buf, "", 0.0, STR|NUM, (Array *) x->sval);
+	z = setsymtab(buf, EMPTY, 0.0, STR|NUM, (Array *) x->sval);
 	z->ctype = OCELL;
 	z->csub = CVAR;
 	if (istemp(x))
@@ -747,7 +748,7 @@ Cell *substr(Node **a, int)		/* substr(a[0], a[1], a[2]) */
 				tfree(z);
 		}
 		x = gettemp();
-		setsval(x, "");
+		setsval(x, EMPTY);
 		return(x);
 	}
 	m = (int) getfval(y);
@@ -1289,7 +1290,7 @@ Cell *split(Node **a, int)	/* split(a[0], a[1], a[2]); a[3] is type */
 				if (t[-1] == 0 || *t == 0) {
 					n++;
 					sprint(num, "%d", n);
-					setsymtab(num, "", 0.0, STR, (Array *) ap->sval);
+					setsymtab(num, EMPTY, 0.0, STR, (Array *) ap->sval);
 					goto spdone;
 				}
 			} while (nematch(p,s,t));
