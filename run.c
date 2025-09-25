@@ -331,7 +331,7 @@ Cell *jump(Node **a, int n)	/* break, continue, next, nextfile, return */
 	case EXIT:
 		if (a[0] != nil) {
 			y = execute(a[0]);
-			if((y->tval & (NUM|STR)) == STR) {
+			if ((y->tval & (NUM|STR)) == STR) {
 				exitstatus = getsval(y);
 			} else if((int) getfval(y) != 0) {
 				exitstatus = "error";

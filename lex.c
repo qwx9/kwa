@@ -164,9 +164,11 @@ int yylex(void)
 			return 0;
 		if (c == 'a')
 			return word(buf);
+		/* may be unsuitable for printing (T.strnum) so don't set STR,
+		 * but may be a regex to be treated literally (T.coerce[23])
+		 * via strnode, so save a copy. */
 		if (c == '0') {
 			yylval.cp = setsymtab(buf, tostring(buf), f, CON|NUM, symtab);
-			/* should this also have STR set? */	/* FIXME: yes. */
 			RET(NUMBER);
 		}
 	
@@ -428,7 +430,7 @@ int word(char *w)
 	Keyword *kp;
 	int c, n;
 
-	n = binsearch(w, keywords, sizeof(keywords)/sizeof(keywords[0]));
+	n = binsearch(w, keywords, nelem(keywords));
 	kp = keywords + n;
 	if (n != -1) {	/* found in table */
 		yylval.i = kp->sub;
