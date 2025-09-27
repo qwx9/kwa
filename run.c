@@ -1523,7 +1523,6 @@ Cell *bltin(Node **a, int)	/* builtin functions. a[0] is type, a[1] is arg list 
 	Node *nextarg;
 	Biobuf *fp;
 	void flush_all(void);
-	int (*test)(Rune);
 	Rune (*conv)(Rune);
 
 	t = ptoi(a[0]);
@@ -1584,17 +1583,10 @@ Cell *bltin(Node **a, int)	/* builtin functions. a[0] is type, a[1] is arg list 
 		n = utflen(buf) * UTFmax + 1;	/* just in case size differs... */
 		if ((rbuf = malloc(n)) == nil)
 			FATAL("out of space in %s", t == FTOUPPER ? "toupper" : "tolower");
-		if (t == FTOUPPER) {
-			test = islowerrune;
-			conv = toupperrune;
-		} else {
-			test = isupperrune;
-			conv = tolowerrune;
-		}
-		for (p = rbuf, s = buf; *s; s += n) {
-			n = chartorune(&wc, s);
-			if (test(wc))
-				wc = conv(wc);
+		conv = t == FTOUPPER ? toupperrune : tolowerrune;
+		for (p = rbuf, s = buf; *s != '\0';) {
+			s += chartorune(&wc, s);
+			wc = conv(wc);
 			p += runetochar(p, &wc);
 		}
 		*p = 0;
