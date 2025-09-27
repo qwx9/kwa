@@ -1,0 +1,27 @@
+#!/bin/rc
+echo T.main: misc tests of arguments in main
+
+rm -f core
+
+# test -d option
+echo hello | $awk -d '{print}' >foo1 || echo 'BAD: T.main awk -d (wanted to) drop core'
+
+echo 'a::b::c' >foo
+$awk -F:: '{print NF}' foo >foo1
+echo '3' >foo2
+diff foo1 foo2 || echo 'BAD: awk -F::'
+
+echo 'a::b::c' >foo
+$awk -F :: '{print NF}' foo >foo1
+echo '3' >foo2
+diff foo1 foo2 || echo 'BAD: awk -F ::'
+
+echo 'a	b	c' >foo
+$awk -F t '{print NF}' foo >foo1
+echo '3' >foo2
+diff foo1 foo2 || echo 'BAD: awk -F (tab)'
+
+echo 'atabbtabc' >foo
+$awk -F tab '{print NF}' foo >foo1
+echo '3' >foo2
+diff foo1 foo2 || echo 'BAD: awk -F tab'
