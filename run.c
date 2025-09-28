@@ -817,6 +817,7 @@ int format(char **pbuf, int *pbufsize, char *s, Node *a)	/* printf-like conversi
 {
 	char *fmt;
 	char *p, *t, *os;
+	Rune r;
 	Cell *x;
 	int flag, n;
 	int fmtwd; /* format width */
@@ -893,6 +894,7 @@ int format(char **pbuf, int *pbufsize, char *s, Node *a)	/* printf-like conversi
 			flag = 4;
 			break;
 		case 'c':
+			t[-1] = 'C';
 			flag = 5;
 			break;
 		default:
@@ -940,8 +942,8 @@ int format(char **pbuf, int *pbufsize, char *s, Node *a)	/* printf-like conversi
 					*p = '\0';
 				}
 			} else {
-				if((*p = getsval(x)[0]) != '\0')
-					p++;
+				chartorune(&r, getsval(x));
+				p += runetochar(p, &r);
 				*p = '\0';
 			}
 			break;
