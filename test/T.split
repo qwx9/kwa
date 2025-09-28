@@ -54,7 +54,7 @@ diff $TEMP1 $TEMP2 || echo 'BAD: T.split 0.3'
 echo 'f b a' > $TEMP0
 $awk '{
 	FS = ":"
-	getline a < "/lib/theo"
+	getline a < "/lib/ucd/UnicodeData.txt"
 	print $1
 }' $TEMP0 > $TEMP1
 echo 'f' > $TEMP2
@@ -101,7 +101,7 @@ f
 
      ' > $TEMP0
 who | sed 10q  >> $TEMP0
-sed 10q /lib/theo >> $TEMP0
+sed 10q /lib/ucd/UnicodeData.txt >> $TEMP0
 
 $awk '
 {	n = split($0, x, "")
