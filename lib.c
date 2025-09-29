@@ -649,6 +649,8 @@ static int is_float(char *s, Awkfloat *fp, char **tp)
 		return 0;
 	else if (f == 0.0 && ((q = strchr(s, '0')) == nil || q > p))
 		return 0;
+	else if (tp != nil)
+		return 1;
 	for (; (c = *p) != '\0'; p++) {
 		switch(c) {
 		case ' ':
@@ -670,7 +672,7 @@ static int is_float(char *s, Awkfloat *fp, char **tp)
 int to_number(char *s, Awkfloat *fp, char **tp)
 {
 	vlong v;
-	char *p, *q;
+	char c, *p, *q;
 
 	v = strtoll(s, &p, 0);
 	*fp = (Awkfloat)v;
@@ -687,15 +689,15 @@ int to_number(char *s, Awkfloat *fp, char **tp)
 		if (is_float(s, fp, tp))
 			return NUM;
 		return 0;
-	case '\0':
-		if (p == s)
-			return 0;
-		else if (v != 0 || (q = strchr(s, '0')) != nil && q < p)
-			return NUM;
-		break;
 	}
-	for (;; p++) {
-		switch(*p) {
+	if (p == s)
+		return 0;
+	else if (v == 0 && ((q = strchr(s, '0')) == nil || q > p))
+		return 0;
+	else if (tp != nil)
+		return NUM;
+	for (; (c = *p) != '\0'; p++) {
+		switch(c) {
 		case ' ':
 		case '\t':
 		case '\n':
@@ -709,4 +711,5 @@ int to_number(char *s, Awkfloat *fp, char **tp)
 			return 0;
 		}
 	}
+	return NUM;
 }

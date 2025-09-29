@@ -125,10 +125,12 @@ static int gettok(char **pbuf, int *psz, Awkfloat *fp)	/* get next input token *
 			}
 		}
 		*bp = 0;
-		to_number(buf, fp, &rem);	/* parse the number */
+		if(to_number(buf, fp, &rem))	/* parse the number */
+			c = '0';
+		else
+			c = buf[0];
 		unputstr(rem);		/* put rest back for later */
 		rem[0] = 0;
-		c = '0';
 	}
 	*pbuf = buf;
 	*psz = sz;
