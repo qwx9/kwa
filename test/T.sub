@@ -28,7 +28,7 @@ $5 != "" {	# new gsub output
 	gsubout = $5
 }
 NF < 5 {	# weird input line
-	printf("weird test spec `%s` ignored\n", $0) | "cat 1>&2"
+	printf("weird test spec `%s` ignored\n", $0) | "cat >[1=2]"
 	next
 }
 {		# "" => explicitly empty
