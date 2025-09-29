@@ -74,7 +74,7 @@ BEGIN {
 		n++
 	print n
 }' >foo2
-cmp -s foo1 foo2 || echo 'BAD: T.overflow big array'
+cmp -s foo1 foo2 || echo 'BAD: T.overflow big array'
 
 echo x >foo1
 $awk '{print $40000000000000}' <foo1 >foo2 >[2]foo

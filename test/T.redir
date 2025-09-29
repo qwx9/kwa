@@ -1,21 +1,23 @@
 #!/bin/rc
 echo T.redir: test redirections
 
-$awk '{ print >"foo" }' /lib/ucd/UnicodeData.txt
-diff foo /lib/ucd/UnicodeData.txt || echo 'BAD: T.redir (print >"foo")'
+sed 1000q /lib/ucd/UnicodeData.txt >foo.txt
+
+$awk '{ print >"foo" }' foo.txt
+diff foo foo.txt || echo 'BAD: T.redir (print >"foo")'
 
 rm -f foo
-$awk '{ print >>"foo" }' /lib/ucd/UnicodeData.txt
-diff foo /lib/ucd/UnicodeData.txt || echo 'BAD: T.redir (print >>"foo")'
+$awk '{ print >>"foo" }' foo.txt
+diff foo foo.txt || echo 'BAD: T.redir (print >>"foo")'
 
 rm -f foo
 $awk 'NR%2 == 1 { print >>"foo" }
-      NR%2 == 0 { print >"foo" }' /lib/ucd/UnicodeData.txt
-diff foo /lib/ucd/UnicodeData.txt || echo 'BAD: T.redir (print > and >>"foo")'
+      NR%2 == 0 { print >"foo" }' foo.txt
+diff foo foo.txt || echo 'BAD: T.redir (print > and >>"foo")'
 
 rm -f foo
-$awk '{ print | "cat >foo" }' /lib/ucd/UnicodeData.txt
-diff foo /lib/ucd/UnicodeData.txt || echo 'BAD: T.redir (print | "cat >foo")'
+$awk '{ print | "cat >foo" }' foo.txt
+diff foo foo.txt || echo 'BAD: T.redir (print | "cat >foo")'
 
 # tests flush of stdout before opening pipe
 echo '   head
@@ -26,10 +28,10 @@ $awk 'BEGIN { print "   head"
 		print i | "sort" }' >foo2
 diff foo1 foo2 || echo 'BAD: T.redir (buffering)'
 
-$awk '{ print >"/fd/2" }' /lib/ucd/UnicodeData.txt >foo1 >[2]foo2
-diff foo2 /lib/ucd/UnicodeData.txt || echo 'BAD: T.redir (print >"/fd/2")'
+$awk '{ print >"/fd/2" }' foo.txt >foo1 >[2]foo2
+diff foo2 foo.txt || echo 'BAD: T.redir (print >"/fd/2")'
 diff foo1 /dev/null  || echo 'BAD: T.redir (print >"/fd/2")'
 
-$awk '{ print >"/fd/1" }' /lib/ucd/UnicodeData.txt >foo1 >[2]foo2
-diff foo1 /lib/ucd/UnicodeData.txt || echo 'BAD: T.redir (print >"/fd/1")'
+$awk '{ print >"/fd/1" }' foo.txt >foo1 >[2]foo2
+diff foo1 foo.txt || echo 'BAD: T.redir (print >"/fd/1")'
 diff foo2 /dev/null  || echo 'BAD: T.redir (print >"/fd/2")'

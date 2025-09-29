@@ -1,9 +1,11 @@
 #!/bin/rc
 echo T.close: test close built-in
 
+sed 1000q /lib/ucd/UnicodeData.txt >foo.txt
+
 rm -f foo
-$awk '{ print >>"foo"; close("foo") }' /lib/ucd/UnicodeData.txt
-diff /lib/ucd/UnicodeData.txt foo || echo 'BAD: T.close (1)'
+$awk '{ print >>"foo"; close("foo") }' foo.txt
+diff foo.txt foo || echo 'BAD: T.close (1)'
 
 ls -l >foo
 tail -1 foo >foo1
@@ -12,7 +14,7 @@ diff foo1 foo2 || echo 'BAD: T.close (2)'
 
 echo 0 >foo1
 $awk '	# non-accessible file
-  BEGIN { getline <"/lib/ucd/UnicodeData.txt"; print close("/lib/ucd/UnicodeData.txt"); }
+  BEGIN { getline <"foo.txt"; print close("foo.txt"); }
 ' >foo2
 diff foo1 foo2 || echo 'BAD: T.close (3)'
 

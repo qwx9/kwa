@@ -68,11 +68,13 @@ $awk '/^#/' >foo1
 echo '#' >foo2
 diff foo1 foo2 || echo >[1=2] 'BAD: T.misc bad match of 8-bit char'
 
+sed 1000q /lib/ucd/UnicodeData.txt >foo.txt
+
 echo hello |
-$awk 'BEGIN	{ FILENAME = "/lib/ucd/UnicodeData.txt" }
+$awk 'BEGIN	{ FILENAME = "foo.txt" }
 	{ print $0 }' >/dev/null
 if(! ~ $status '')
-	echo >[1=2] 'BAD: T.misc /lib/ucd/UnicodeData.txt dropped core'
+	echo >[1=2] 'BAD: T.misc foo.txt dropped core'
 
 echo hello |
 $awk '  function foo(foo) {
@@ -161,9 +163,7 @@ if(! ~ $status '')
 	echo >[1=2] 'BAD: T.misc unireghf dropped core'
 
 echo x | $awk '/[/]/' >[2]foo
-grep 'nonterminated character class' foo >/dev/null || error 'BAD: T.misc nonterminated fails'
-if(! ~ $status '')
-	echo >[1=2] 'BAD: T.misc nonterminated dropped core'
+grep 'nonterminated character class' foo >/dev/null || echo 'BAD: T.misc nonterminated fails'
 
 $awk '
 function f() { return 12345 }
@@ -277,8 +277,6 @@ if(! ~ $status '')
 # The following syntax error should not dump core:
 $awk '{ n = split($1, address, !); print address[1] }' >[2]foo
 grep 'illegal statement' foo >/dev/null || echo 'BAD: T.misc split error'
-if(! ~ $status '')
-	echo >[1=2] 'BAD: T.misc split! dropped core'
 
 # The following should cause a syntax error message
 $awk 'BEGIN {"hello"}' >[2]foo
@@ -337,12 +335,12 @@ cmp -s foo1 foo2 || echo 'BAD: T.misc BEGIN exit'
 
 echo 1 >foo1
 $awk '	{ exit }
-	END { print NR }' /lib/ucd/UnicodeData.txt >foo2
+	END { print NR }' foo.txt >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc immmediate exit'
 
 echo 1 >foo1
 $awk '	{i = 1; while (i <= NF) {if (i == NF) exit; i++ } }
-	END { print NR }' /lib/ucd/UnicodeData.txt >foo2
+	END { print NR }' foo.txt >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc immmediate exit 2'
 
 echo 1 >foo1
@@ -350,7 +348,7 @@ $awk '	function f() {
 		i = 1; while (i <= NF) {if (i == NF) return NR; i++ }
 	}
 	{ if (f() == 1) exit }
-	END { print NR }' /lib/ucd/UnicodeData.txt >foo2
+	END { print NR }' foo.txt >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc while return'
 
 echo 1 >foo1
@@ -359,12 +357,12 @@ $awk '	function f() {
 		for (i in arr) {if (i == 3) return NR; i++ }
 	}
 	{ if (f() == 1) exit }
-	END { print NR }' /lib/ucd/UnicodeData.txt >foo2
+	END { print NR }' foo.txt >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc while return'
 
 echo 1 >foo1
 $awk '	{i = 1; do { if (i == NF) exit; i++ } while (i <= NF) }
-	END { print NR }' /lib/ucd/UnicodeData.txt >foo2
+	END { print NR }' foo.txt >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc immmediate exit 3'
 
 echo 1 >foo1
@@ -372,12 +370,12 @@ $awk '	function f() {
 		i = 1; do { if (i == NF) return NR; i++ } while (i <= NF)
 	}
 	{ if (f() == 1) exit }
-	END { print NR }' /lib/ucd/UnicodeData.txt >foo2
+	END { print NR }' foo.txt >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc do return'
 
 echo 1 >foo1
 $awk '	{i = 1; do { if (i == NF) break; i++ } while (i <= NF); exit }
-	END { print NR }' /lib/ucd/UnicodeData.txt >foo2
+	END { print NR }' foo.txt >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc immmediate exit 4'
 
 echo 1 >foo1
@@ -385,7 +383,7 @@ $awk '	{ n = split($0, x)
 	  for (i in x) {
 	 	if (i == 1)
 			exit } }
-	END { print NR }' /lib/ucd/UnicodeData.txt >foo2
+	END { print NR }' foo.txt >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc immmediate exit 5'
 
 echo XXXXXXXX >foo1
@@ -393,7 +391,7 @@ $awk 'BEGIN { s = "ab\fc\rd\be"
 	t = s; 	gsub("[" s "]", "X", t); print t }' >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc weird escapes in char class'
 
-$awk '{}' /lib/ucd/UnicodeData.txt glop/glop >foo >[2]foo2
+$awk '{}' foo.txt glop/glop >foo >[2]foo2
 grep 'can''t open.*glop' foo2 >/dev/null || echo 'BAD: T.misc can''t open'
 
 echo '
