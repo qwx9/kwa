@@ -1,6 +1,6 @@
 #!/bin/rc
 rfork e
-oldawk=awk
+oldawk=trueawk
 awk=kwa
 
 # an arbitrary collection of input data
@@ -15,12 +15,12 @@ td=foo.td
 
 for(i in tt.*){
 	echo -n $oldawk': '
-	time $oldawk -f $i $td >foo2 >[2]foo2t
-	cat foo2t
+	time $oldawk -f $i $td >foo2.$i >[2]foo2t.$i
+	cat foo2t.$i
 	echo -n $awk': '
-	time $awk -f $i $td >foo1 >[2]foo1t
-	cat foo1t
-	cmp foo1 foo2
+	time $awk -f $i $td >foo1.$i >[2]foo1t.$i
+	cat foo1t.$i
+	cmp foo1.$i foo2.$i
 	echo $i: >>footot
-	cat foo1t foo2t >>footot
+	cat foo1t.$i foo2t.$i >>footot
 }
