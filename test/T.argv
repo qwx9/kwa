@@ -43,6 +43,7 @@ $awk
 a
 bc
 def
+
 !
 diff foo1 foo2 || echo 'BAD: T.argv (argc *)'
 
