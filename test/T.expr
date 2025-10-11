@@ -16,28 +16,29 @@ $1 ~ /try/ {	# new test
 	printf("%3d  %s\n", nt, prog)
 	prog = sprintf("%s -F''\\t'' ''%s''", awk, prog)
 	# print "prog is", prog
-	nt2 = 0
+	nt2 = 1
 	while (getline > 0) {
 		if (NF == 0)	# blank line terminates a sequence
 			break
 		input = $1
 		for (i = 2; i < NF; i++)	# input data
 			input = input "\t" $i
-		test = sprintf("echo ''%s'' | %s >foo1; ",
+		test = sprintf("echo ''%s'' | %s >foo1."nt"."nt2"; ",
 			input, prog)
 		if ($NF == "\"\"")
-			output = ">foo2;"
+			output = ">foo2."nt"."nt2";"
 		else
-			output = sprintf("echo ''%s'' >foo2; ", $NF)
+			output = sprintf("echo ''%s'' >foo2."nt"."nt2"; ", $NF)
 		gsub(/\\t/, "\t", output)
 		gsub(/\\n/, "\n", output)
-		run = sprintf("cmp foo1 foo2 || echo test %d.%d failed",
-			nt, ++nt2)
+		run = sprintf("cmp foo1."nt"."nt2 " foo2."nt"."nt2 " || echo test %d.%d failed",
+			nt, nt2)
 		# print  "input is", input
 		# print  "test is", test
 		# print  "output is", output
 		# print  "run is", run
 		system(test output run)
+		nt2++
 	}
 	tt += nt2
 }
