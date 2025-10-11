@@ -72,8 +72,8 @@ sed 1000q /lib/ucd/UnicodeData.txt >foo.txt
 
 echo hello |
 $awk 'BEGIN	{ FILENAME = "foo.txt" }
-	{ print $0 }' >/dev/null
-if(! ~ $status '')
+	{ print $0 }' >foo >[2=1]
+if(grep suicide foo)
 	echo >[1=2] 'BAD: T.misc foo.txt dropped core'
 
 echo hello |
@@ -82,8 +82,8 @@ $awk '  function foo(foo) {
                 foo()
         }
 	{ foo(bar) }
-' >/dev/null >[2=1]
-if(! ~ $status '')
+' >foo >[2=1]
+if(grep suicide foo)
 	echo >[1=2] 'BAD: T.misc function foo(foo) dropped core'
 
 echo '2
@@ -153,13 +153,13 @@ $awk '
 BEGIN {
 	printf "push return" >"/dev/null"
 	getline ans <"/dev/null"
-} '
-if(! ~ $status '')
+} ' >foo >[2=1]
+if(grep suicide foo)
 	echo >[1=2] 'BAD: T.misc getline ans dropped core'
 
 $awk 'BEGIN { unireghf() }
-function unireghf(hfeed) { hfeed[1] = 0 }'
-if(! ~ $status '')
+function unireghf(hfeed) { hfeed[1] = 0 }' >foo >[2=1]
+if(grep suicide foo)
 	echo >[1=2] 'BAD: T.misc unireghf dropped core'
 
 echo x | $awk '/[/]/' >[2]foo
@@ -249,8 +249,8 @@ function min(a, b)
 		return b
 }
 BEGIN { exit }
-'
-if(! ~ $status '')
+' >foo >[2=1]
+if(grep suicide foo)
 	echo >[1=2] 'BAD: T.misc function min dropped core'
 
 # The following should not give a syntax error message:
@@ -261,8 +261,8 @@ function expand(chart) {
 ' >foo
 grep '^' foo >/dev/null && echo 'BAD: T.misc expand error'
 
-$awk 'BEGIN { print 1e40 }' >/dev/null
-if(! ~ $status '')
+$awk 'BEGIN { print 1e40 }' >foo >[2=1]
+if(grep suicide foo)
 	echo >[1=2] 'BAD: T.misc 1E40 dropped core'
 
 # The following syntax error should not dump core:
@@ -270,8 +270,8 @@ $awk '
 $NF==3	{first=1}
 $NF==2 && first==0 && (abs($1-o1)>120||abs($2-o2)>120)	{print $0}
 $NF==2	{o1=%1; o2=$2; first=0}
-' >[2]/dev/null
-if(! ~ $status '')
+' >log >[2=1]
+if(grep suicide foo)
 	echo >[1=2] 'BAD: T.misc first/abs dropped core'
 
 # The following syntax error should not dump core:
@@ -299,8 +299,8 @@ grep 'requires two arg' foo >/dev/null || echo 'BAD: T.misc atan2 error'
 # This should not core dump:
 $awk 'BEGIN { f() }
 function f(A) { delete A[1] }
-'
-if(! ~ $status '')
+' >log >[2=1]
+if(grep suicide foo)
 	echo >[1=2] 'BAD: T.misc delete dropped core'
 
 # nasty one:  should not be able to overwrite constants
@@ -323,7 +323,7 @@ $awk '#
 ' >/dev/null >[2]foo
 grep 'line [45]' foo >/dev/null || echo 'BAD: T.misc lineno'
 
-echo 'x\y' >foo1
+echo 'x\y' >foo1
 $awk 'BEGIN { print "x\f\r\b\v\a\\y" }' >foo2
 cmp -s foo1 foo2 || echo 'BAD: T.misc weird chars'
 
@@ -489,7 +489,7 @@ grep 'non-terminated' foo >/dev/null || echo >[1=2] 'BAD: T.misc non-terminated 
 #grep 'illegal statement' foo >/dev/null || echo >[1=2] 'BAD: T.misc looping syntax error 3'
 
 $awk 'BEGIN {printf "%2$s %1$s\n", "a", "b"}' >foo >[2=1]
-grep '''$'' not permitted in awk formats' foo >/dev/null || echo >[1=2] 'BAD: T.misc ''$'' not permitted in formats'
+grep '''\$'' not permitted in awk formats' foo >/dev/null || echo >[1=2] 'BAD: T.misc ''$'' not permitted in formats'
 
 echo 'a
 b c
