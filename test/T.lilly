@@ -1,0 +1,28 @@
+#!/bin/rc
+echo T.lilly: miscellaneous RE tests from Bruce Lilly
+
+rm -f foo
+$oldawk '
+BEGIN { awk = ENVIRON["oldawk"] }
+/./ {
+	print $0 >"foo"
+	close("foo")
+	print "###", NR, $0
+	system(awk " -f foo <lilly.ifile")
+}' <lilly.progs >foo1 >[2=1]
+
+rm -f foo
+$awk '
+BEGIN { awk = ENVIRON["awk"] }
+/./ {
+	print $0 >"foo"
+	close("foo")
+	print "###", NR, $0
+	system(awk " -f foo <lilly.ifile")
+}' <lilly.progs >foo2 >[2=1]
+
+echo `{cat lilly.progs | wc -l} tests
+
+sed -e 's/'^$oldawk^'://' -e 's/Syntax/syntax/' -e '/warning:/d' foo1 >foo.glop1
+sed 's/'^$awk^'://' foo2 >foo.glop2
+diff foo.glop1 foo.glop2 >foo.lilly.diff || echo 'BAD: check foo.lilly.diff'
