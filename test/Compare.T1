@@ -3,5 +3,44 @@ rfork e
 oldawk=trueawk
 awk=kwa
 
-for(i in T.*)
+working=(\
+	T.-f-f \
+	T.chem \
+	T.csconcat \
+	T.delete \
+	T.exprconv \
+	T.func \
+	T.getline \
+	T.lilly \
+	T.main \
+	T.redir \
+	T.system \
+)
+
+broken=(\
+	T.argv \
+	T.arnold \
+	T.builtin \
+	T.close \
+	T.clv \
+	T.errmsg \
+	T.expr \
+	T.flags \
+	T.int-expr \
+	T.latin1 \
+	T.misc \
+	T.nextfile \
+	T.overflow \
+	T.re \
+	T.recache \
+	T.split \
+	T.sub \
+	T.utf \
+	T.utfre \
+)
+
+for(i in $working)
+	./$i
+echo known broken
+for(i in $broken)
 	./$i
