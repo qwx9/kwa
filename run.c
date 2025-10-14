@@ -933,11 +933,16 @@ int format(char **pbuf, int *pbufsize, char *s, Node *a)	/* printf-like conversi
 			sprint(p, fmt, t);
 			break;
 		case 5:
-			if (isnum(x))
-				r = (Rune) getfval(x);
-			else
-				chartorune(&r, getsval(x));
-			p += runetochar(p, &r);
+			if (isnum(x)) {
+				r = getfval(x);
+				p += runetochar(p, &r);
+			} else {
+				t = getsval(x);
+				if(*t != '\0'){
+					chartorune(&r, t);
+					p += runetochar(p, &r);
+				}
+			}
 			*p = '\0';
 			break;
 		}
