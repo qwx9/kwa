@@ -482,9 +482,11 @@ grep 'non-terminated' foo >/dev/null || echo >[1=2] 'BAD: T.misc non-terminated 
 #}' >foo >[2=1]
 #grep 'illegal statement' foo >/dev/null || echo >[1=2] 'BAD: T.misc looping syntax error 1'
 
+# FIXME
 #$awk 'BEGIN { s { c /./ } }' >foo >[2=1]
 #grep 'illegal statement' foo >/dev/null || echo >[1=2] 'BAD: T.misc looping syntax error 2'
 
+# FIXME
 #$awk 'BEGIN { s { c /../ } }' >foo >[2=1]
 #grep 'illegal statement' foo >/dev/null || echo >[1=2] 'BAD: T.misc looping syntax error 3'
 

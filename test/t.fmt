@@ -1,0 +1,30 @@
+{
+	for(x=1; x<=NF; x++){
+		OFMT = CONVFMT = "%.6g"
+		a = $x / 3
+		b = $x / 3 "_"
+		c = a "_"
+		s = a " " b " " c
+		OFMT="[%.1f]"
+		d = $x / 3
+		e = $x / 3 "_"
+		f = d "_"
+		s = s " " d " " e " " f
+		CONVFMT="(%.2f)"
+		g = $x / 3
+		h = $x / 3 "_"
+		i = g "_"
+		s = s " " g " " h " " i
+		OFMT="{%.1g}"
+		a = $x / 3
+		b = $x / 3 "_"
+		c = a "_"
+		s = s " " a " " b " " c
+		CONVFMT="|%.2g|"
+		d = $x / 3
+		e = $x / 3 "_"
+		f = d "_"
+		s = s " " d " " e " " f
+		print s
+	}
+}
