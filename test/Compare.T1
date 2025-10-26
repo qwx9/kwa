@@ -9,7 +9,7 @@ working=(\
 	T.csconcat \
 	T.delete \
 	T.exprconv \
-	T.func \
+	T.fmt \
 	T.getline \
 	T.lilly \
 	T.main \
@@ -26,6 +26,7 @@ broken=(\
 	T.errmsg \
 	T.expr \
 	T.flags \
+	T.func \
 	T.int-expr \
 	T.latin1 \
 	T.misc \
