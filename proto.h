@@ -63,6 +63,7 @@ extern	void	funnyvar(Cell *, char *);
 extern	char	*setsval(Cell *, char *);
 extern	double	getfval(Cell *);
 extern	char	*getsval(Cell *);
+extern	char	*getpssval(Cell *); /* for print */
 extern	char	*tostring(char *);
 extern	char	*qstring(char *, int);
 

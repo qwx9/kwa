@@ -352,8 +352,9 @@ Awkfloat getfval(Cell *vp)	/* get float val of a Cell */
 	return(vp->fval);
 }
 
-char *getsval(Cell *vp)	/* get string val of a Cell */
+static char *get_str_val(Cell *vp, char **fmt)	/* get string val of a Cell */
 {
+	int conv;
 	char s[100];	/* BUG: unchecked */
 	double dtemp;
 
@@ -363,19 +364,37 @@ char *getsval(Cell *vp)	/* get string val of a Cell */
 		fldbld();
 	else if (isrec(vp) && donerec == 0)
 		recbld();
-	if (isstr(vp) == 0) {
+	conv = (uintptr)fmt >> 32 ^ (uintptr)fmt & 0xffffffff;
+	if (isstr(vp) == 0
+	|| ((vp->tval & DONTFREE) == 0 && isnum(vp) && !isfld(vp))
+	&& (fmt == OFMT ^ (vp->tval & FMT) != 0 || vp->conv != conv)) {
 		if (freeable(vp))
 			xfree(vp->sval);
 		if (modf(vp->fval, &dtemp) == 0)	/* it's integral */
 			sprint(s, "%.30g", vp->fval);
 		else
-			sprint(s, *CONVFMT, vp->fval);
+			sprint(s, *fmt, vp->fval);
 		vp->sval = tostring(s);
 		vp->tval &= ~DONTFREE;
 		vp->tval |= STR;
+		if (fmt == OFMT)
+			vp->tval |= FMT;
+		else
+			vp->tval &= ~FMT;
+		vp->conv = conv;
 	}
 	   dprint( ("getsval %p: %s = \"%s (%p)\", t=%o\n", vp, vp->nval, vp->sval, vp->sval, vp->tval) );
 	return(vp->sval);
+}
+
+char *getsval(Cell *vp)		/* get string val of a Cell */
+{
+	return get_str_val(vp, CONVFMT);
+}
+
+char *getpssval(Cell *vp)	/* get string val of a Cell for print */
+{
+	return get_str_val(vp, OFMT);
 }
 
 char *tostring(char *s)	/* make a copy of string s */

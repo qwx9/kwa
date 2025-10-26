@@ -12,23 +12,23 @@ extern	Awkfloat	srand_seed;
 Node	*winner = nil;	/* root of parse tree */
 Cell	*tmps;		/* free temporary cells for execution */
 
-static Cell	truecell	={ OBOOL, BTRUE, NUM, 0, 0, 1.0 };
+static Cell	truecell	={ OBOOL, BTRUE, NUM, 0, 0, 0, 1.0 };
 Cell	*True	= &truecell;
-static Cell	falsecell	={ OBOOL, BFALSE, NUM, 0, 0, 0.0 };
+static Cell	falsecell	={ OBOOL, BFALSE, NUM, 0, 0, 0, 0.0 };
 Cell	*False	= &falsecell;
-static Cell	breakcell	={ OJUMP, JBREAK, NUM, 0, 0, 0.0 };
+static Cell	breakcell	={ OJUMP, JBREAK, NUM, 0, 0, 0, 0.0 };
 Cell	*jbreak	= &breakcell;
-static Cell	contcell	={ OJUMP, JCONT, NUM, 0, 0, 0.0 };
+static Cell	contcell	={ OJUMP, JCONT, NUM, 0, 0, 0, 0.0 };
 Cell	*jcont	= &contcell;
-static Cell	nextcell	={ OJUMP, JNEXT, NUM, 0, 0, 0.0 };
+static Cell	nextcell	={ OJUMP, JNEXT, NUM, 0, 0, 0, 0.0 };
 Cell	*jnext	= &nextcell;
-static Cell	nextfilecell	={ OJUMP, JNEXTFILE, NUM, 0, 0, 0.0 };
+static Cell	nextfilecell	={ OJUMP, JNEXTFILE, NUM, 0, 0, 0, 0.0 };
 Cell	*jnextfile	= &nextfilecell;
-static Cell	exitcell	={ OJUMP, JEXIT, NUM, 0, 0, 0.0 };
+static Cell	exitcell	={ OJUMP, JEXIT, NUM, 0, 0, 0, 0.0 };
 Cell	*jexit	= &exitcell;
-static Cell	retcell		={ OJUMP, JRET, NUM, 0, 0, 0.0 };
+static Cell	retcell		={ OJUMP, JRET, NUM, 0, 0, 0, 0.0 };
 Cell	*jret	= &retcell;
-static Cell	tempcell	={ OCELL, CTEMP, NUM|STR|DONTFREE, 0, EMPTY, 0.0 };
+static Cell	tempcell	={ OCELL, CTEMP, NUM|STR|DONTFREE, 0, 0, EMPTY, 0.0 };
 
 Node	*curnode = nil;	/* the node being executed, for debugging */
 
@@ -200,7 +200,7 @@ struct Frame *fp = nil;	/* frame pointer. bottom level unused */
 
 Cell *call(Node **a, int)	/* function call.  very kludgy and fragile */
 {
-	static Cell newcopycell = { OCELL, CCOPY, NUM|STR|DONTFREE, 0, EMPTY, 0.0 };
+	static Cell newcopycell = { OCELL, CCOPY, NUM|STR|DONTFREE, 0, 0, EMPTY, 0.0 };
 	int i, ncall, ndef;
 	Node *x;
 	Cell *args[NARGS], *oargs[NARGS];	/* BUG: fixed size arrays */
@@ -1633,6 +1633,7 @@ Cell *bltin(Node **a, int)	/* builtin functions. a[0] is type, a[1] is arg list 
 Cell *printstat(Node **a, int)	/* print a[0] */
 {
 	int r;
+	char *s;
 	Node *x;
 	Cell *y;
 	Biobuf *fp;
@@ -1643,7 +1644,8 @@ Cell *printstat(Node **a, int)	/* print a[0] */
 		fp = redirect(ptoi(a[1]), a[2]);
 	for (x = a[0]; x != nil; x = x->nnext) {
 		y = execute(x);
-		Bwrite(fp, getsval(y), strlen(getsval(y)));
+		s = getpssval(y);
+		Bwrite(fp, s, strlen(s));
 		if (istemp(y))
 			tfree(y);
 		if (x->nnext == nil)

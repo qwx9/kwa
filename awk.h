@@ -55,6 +55,7 @@ typedef struct Cell {
 	uchar	ctype;		/* OCELL, OBOOL, OJUMP, etc. */
 	uchar	csub;		/* CCON, CTEMP, CFLD, etc. */
 	short	tval;		/* type info: STR|NUM|ARR|FCN|FLD|CON|DONTFREE */
+	int		conv;		/* "pointer" to last used conv */
 	char	*nval;		/* name, for variables only */
 	char	*sval;		/* string value */
 	Awkfloat fval;		/* value as number */
@@ -85,7 +86,7 @@ extern Cell	*rlengthloc;	/* RLENGTH */
 #define	FCN	040	/* this is a function name */
 #define FLD	0100	/* this is a field $1, $2, ... */
 #define	REC	0200	/* this is $0 */
-
+#define	FMT	0400	/* OFMT used instead of CONVFMT */
 
 /* function types */
 #define	FLENGTH	1
