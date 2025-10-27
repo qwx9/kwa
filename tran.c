@@ -214,6 +214,7 @@ Cell *setsymtab(char *n, char *s, Awkfloat f, unsigned t, Array *tp)
 	}
 	p->csub = CUNK;
 	p->ctype = OCELL;
+	p->conv = 0;
 	tp->nelemt++;
 	if (tp->nelemt > FULLTAB * tp->size)
 		rehash(tp);
@@ -364,9 +365,9 @@ static char *get_str_val(Cell *vp, char **fmt)	/* get string val of a Cell */
 		fldbld();
 	else if (isrec(vp) && donerec == 0)
 		recbld();
-	conv = (uintptr)fmt >> 32 ^ (uintptr)fmt & 0xffffffff;
+	conv = (uintptr)*fmt >> 32 ^ (uintptr)*fmt & 0xffffffff;
 	if (isstr(vp) == 0
-	|| ((vp->tval & DONTFREE) == 0 && isnum(vp) && !isfld(vp))
+	|| vp->conv != 0 && (vp->tval & DONTFREE) == 0 && isnum(vp) && !isfld(vp)
 	&& (fmt == OFMT ^ (vp->tval & FMT) != 0 || vp->conv != conv)) {
 		if (freeable(vp))
 			xfree(vp->sval);
