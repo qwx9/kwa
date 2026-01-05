@@ -57,16 +57,16 @@ BEGIN { x = 1; print x %= 0 }
 division by zero in mod
 BEGIN { print 1%0 }
 
-can.t read value.* array name.
+can''t read value.* array name.
 BEGIN { x[1] = 0; split("a b c", y, x) }
 
-can.t read value.* function
+can''t read value.* function
 function f(){}; {split($0, x, f)}
 
-can.t assign.* a function
+can''t assign.* a function
 function f(){}; {f = split($0, x)}
 
-can.t assign to x; it.s an array name.
+can''t assign to x; it.s an array name.
 {x = split($0, x)}
 
 is a function, not an array
@@ -76,7 +76,7 @@ function f called with 1 args, uses only 0
 BEGIN { f(f) }
 function f() { print "x" }
 
-can.t use function f as argument in f
+can''t use function f as argument in f
 BEGIN { f(f) }
 function f() { print "x" }
 
@@ -151,10 +151,10 @@ BEGIN { next }
 illegal .*next.* from END
 END {	next; print NR }
 
-can.t open file ./nonexistentdir/foo
+can''t open file ./nonexistentdir/foo
 BEGIN { print "abc" >"./nonexistentdir/foo" }
 
-you can.t define function f more than once
+you can''t define function f more than once
 function f() { print 1 }
 function f() { print 2 }
 
