@@ -1,7 +1,9 @@
 #!/bin/rc
 rfork e
-oldawk=trueawk
-awk=kwa
+if(~ $#oldawk 0)
+	oldawk=trueawk
+if(~ $#awk 0)
+	awk=kwa
 
 for(i in p.*){
 	echo -n $i:
