@@ -23,6 +23,6 @@ BEGIN { awk = ENVIRON["awk"] }
 
 echo `{cat lilly.progs | wc -l} tests
 
-sed -e 's/'^$oldawk^'://' -e 's/Syntax/syntax/' -e '/warning:/d' foo1 >foo.glop1
-sed 's/'^$awk^'://' foo2 >foo.glop2
+sed -e 's#'^$oldawk^':##' -e 's/Syntax/syntax/' -e '/warning:/d' foo1 >foo.glop1
+sed 's#'^$awk^':##' foo2 >foo.glop2
 diff foo.glop1 foo.glop2 >foo.lilly.diff || echo 'BAD: check foo.lilly.diff'
