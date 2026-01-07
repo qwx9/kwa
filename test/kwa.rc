@@ -22,13 +22,9 @@ for(i in p.*){
 	check foo?.$i $i
 }
 
-broken=(\
-	t.gsub4 \
-	t.ofmt \
-)
 echo 't.*: general-purpose tests' >[1=2]
 for(i in t.*){
-	if(! ~ $i $broken){
+	if(! ~ $i *.broken){
 		$oldawk -f $i test.data >foo1.$i >[2=1]
 		$awk -f $i test.data >foo2.$i >[2=1]
 		check foo?.$i $i
@@ -45,7 +41,6 @@ broken=(\
 	T.latin1 \
 	T.misc \
 	T.nextfile \
-	T.overflow \
 	T.re \
 	T.sub \
 	T.utf \
