@@ -11,6 +11,7 @@ extern	int	input(void);
 extern	void	unput(int);
 extern	void	unputstr(char *);
 
+extern	void	releasere(void *);
 extern	void	*compre(char *);
 extern	int	hexstr(char **);
 extern	void	quoted(char **, char **, char *);
