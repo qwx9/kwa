@@ -1,5 +1,5 @@
 #!/bin/rc
-echo T.exprconv:  check conversion of expr to number
+echo T.exprconv:  check conversion of expr to number >[1=2]
 
 $awk '
 BEGIN {	x = (1 > 0); print x
@@ -17,4 +17,4 @@ echo '1
 0
 1
 1' >foo2
-cmp foo1 foo2 || echo 'BAD: T.exprconv (1 > 0, etc.)'
+cmp foo1 foo2 || echo 'BAD: T.exprconv: 1 > 0, etc.' >[1=2]

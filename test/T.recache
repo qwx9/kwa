@@ -1,5 +1,5 @@
 #!/bin/rc
-echo T.recache: test re cache in b.c
+echo T.recache: test re cache in b.c >[1=2]
 	# thanks to ross ridge for this horror
 
 echo b >foo1
@@ -29,4 +29,4 @@ BEGIN {
         print x
 }
 ' >foo2
-diff foo1 foo2 || echo 'BAD: T.recache'
+diff foo1 foo2 || echo 'BAD: T.recache' >[1=2]

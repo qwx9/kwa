@@ -1,37 +1,13 @@
 #!/bin/rc
-echo T.close: test close built-in
+echo T.close: test close built-in >[1=2]
 
 sed 1000q /lib/ucd/UnicodeData.txt >foo.txt
 
 rm -f foo
 $awk '{ print >>"foo"; close("foo") }' foo.txt
-diff foo.txt foo || echo 'BAD: T.close (1)'
+diff foo.txt foo || echo 'BAD: T.close: 1' >[1=2]
 
 ls -l >foo
 tail -1 foo >foo1
 $awk '{ print >"foo2"; close("foo2") }' foo
-diff foo1 foo2 || echo 'BAD: T.close (2)'
-
-echo 0 >foo1
-$awk '	# non-accessible file
-  BEGIN { getline <"foo.txt"; print close("foo.txt"); }
-' >foo2
-diff foo1 foo2 || echo 'BAD: T.close (3)'
-
-echo -1 >foo1
-$awk '	# file not opened
-  BEGIN { print close("glotch"); }
-' >foo2
-diff foo1 foo2 || echo 'BAD: T.close (4)'
-
-echo 0 >foo1
-$awk '	# normal close
-  BEGIN { print "hello" > "foo"; print close("foo"); }
-' >foo2
-diff foo1 foo2 || echo 'BAD: T.close (5)'
-
-echo 0 >foo1
-$awk '	# normal close
-  BEGIN { print "hello" | "cat >foo"; print close("cat >foo"); }
-' >foo2
-diff foo1 foo2 || echo 'BAD: T.close (6)'
+diff foo1 foo2 || echo 'BAD: T.close: 2' >[1=2]

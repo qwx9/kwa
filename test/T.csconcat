@@ -1,5 +1,5 @@
 #!/bin/rc
-echo T.csconcat: test constant string concatenation
+echo T.csconcat: test constant string concatenation >[1=2]
 
 $awk '
 BEGIN {
@@ -25,4 +25,4 @@ hello world
 hello world
 EOF
 
-diff foo1 foo2 || echo 'BAD: T.csconcat (1)'
+diff foo1 foo2 || echo 'BAD: T.csconcat: 1' >[1=2]

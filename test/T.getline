@@ -1,5 +1,5 @@
 #!/bin/rc
-echo T.getline: test getline function
+echo T.getline: test getline function >[1=2]
 
 who >foo1
 cat foo1 | $awk '
@@ -9,7 +9,7 @@ BEGIN {
 	exit
 }
 ' >foo
-cmp -s foo1 foo || echo 'BAD: T.getline (bare getline)'
+cmp -s foo1 foo || echo 'BAD: T.getline: bare getline' >[1=2]
 
 who >foo1
 cat foo1 | $awk '
@@ -19,7 +19,7 @@ BEGIN {
 	exit
 }
 ' >foo
-cmp -s foo1 foo || echo 'BAD: T.getline (getline xxx)'
+cmp -s foo1 foo || echo 'BAD: T.getline: getline xxx' >[1=2]
 
 sed 1000q /lib/ucd/UnicodeData.txt >foo.txt
 
@@ -30,7 +30,7 @@ BEGIN {
 	exit
 }
 ' >foo
-cmp -s foo.txt foo || echo 'BAD: T.getline (getline <file)'
+cmp -s foo.txt foo || echo 'BAD: T.getline: getline <file' >[1=2]
 
 cat foo.txt | $awk '
 BEGIN {
@@ -39,7 +39,7 @@ BEGIN {
 	exit
 }
 ' >foo
-cmp -s foo.txt foo || echo 'BAD: T.getline (getline <"-")'
+cmp -s foo.txt foo || echo 'BAD: T.getline: getline <"-"' >[1=2]
 
 $awk '
 BEGIN {
@@ -48,7 +48,7 @@ BEGIN {
 	exit
 }
 ' foo.txt >foo
-cmp -s foo.txt foo || echo 'BAD: T.getline (getline <arg)'
+cmp -s foo.txt foo || echo 'BAD: T.getline: getline <arg' >[1=2]
 
 $awk '
 BEGIN {
@@ -57,7 +57,7 @@ BEGIN {
 	exit
 }
 ' foo.txt >foo
-cmp -s foo.txt foo || echo 'BAD: T.getline (getline x <arg)'
+cmp -s foo.txt foo || echo 'BAD: T.getline: getline x <arg' >[1=2]
 
 $awk '
 BEGIN {
@@ -66,7 +66,7 @@ BEGIN {
 	exit
 }
 ' foo.txt >foo
-cmp -s foo.txt foo || echo 'BAD: T.getline (cat arg | getline)'
+cmp -s foo.txt foo || echo 'BAD: T.getline: cat arg | getline' >[1=2]
 
 $awk '
 BEGIN {
@@ -75,11 +75,11 @@ BEGIN {
 	exit
 }
 ' foo.txt >foo
-cmp -s foo.txt foo || echo 'BAD: T.getline (cat arg | getline x)'
+cmp -s foo.txt foo || echo 'BAD: T.getline: cat arg | getline x' >[1=2]
 
 $awk ' BEGIN { print getline <"/glop/glop/glop" } ' >foo
 echo '-1' >foo1
-cmp -s foo foo1 || echo 'BAD: T.getline (non-existent file)'
+cmp -s foo foo1 || echo 'BAD: T.getline: non-existent file' >[1=2]
 
 echo 'false false equal' >foo1
 $awk 'BEGIN {
@@ -91,9 +91,9 @@ $awk 'BEGIN {
 	if ($0==$1) printf "equal\n"
 	else printf "not equal\n"
 }' >foo2
-cmp -s foo1 foo2 || echo >[1=2] 'BAD: T.getline bad $0 type in cmd|getline'
+cmp -s foo1 foo2 || echo >[1=2] 'BAD: T.getline bad $0 type in cmd|getline' >[1=2]
 
 echo 'L1
 L2' | $awk 'BEGIN { $0="old stuff"; $1="new"; getline x; print}' >foo1
 echo 'new stuff' >foo2
-cmp -s foo1 foo2 || echo >[1=2] 'BAD: T.getline bad update $0'
+cmp -s foo1 foo2 || echo >[1=2] 'BAD: T.getline bad update $0' >[1=2]

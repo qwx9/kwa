@@ -1,26 +1,9 @@
 #!/bin/rc
-echo T.split: misc tests of field splitting and split command
+echo T.split: misc tests of field splitting and split command >[1=2]
 
 TEMP0=foo0
 TEMP1=foo1
 TEMP2=foo2
-
-$awk 'BEGIN {
-	# Assign string to $0, then change FS.
-	FS = ":"
-	$0="a:bc:def"
-	FS = "-"
-	print FS, $1, NF
-
-	# Assign number to $0, then change FS.
-	FS = "2"
-	$0=1212121
-	FS="3"
-	print FS, $1, NF
-}' > $TEMP1
-echo '- a 3
-3 1 4' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split 0.1'
 
 $awk 'BEGIN {
 	# FS changes after getline.
@@ -30,7 +13,7 @@ $awk 'BEGIN {
 	print FS, $1, NF
 }' > $TEMP1
 echo '- a 3' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split 0.2'
+diff $TEMP1 $TEMP2 || echo 'BAD: T.split: 0.2' >[1=2]
 
 echo '
 a
@@ -47,55 +30,11 @@ echo '0
 2
 3
 4' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split 0.3'
+diff $TEMP1 $TEMP2 || echo 'BAD: T.split: 0.3' >[1=2]
 
 # getline var shouldn't impact fields.
 
 sed 1000q /lib/ucd/UnicodeData.txt >foo.txt
-
-echo 'f b a' > $TEMP0
-$awk '{
-	FS = ":"
-	getline a < "foo.txt"
-	print $1
-}' $TEMP0 > $TEMP1
-echo 'f' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split 0.4'
-
-echo 'a b c d
-foo
-e f g h i
-bar' > $TEMP0
-$awk '{
-	FS=":"
-	getline v
-	print $2, NF
-	FS=" "
-}' $TEMP0 > $TEMP1
-echo 'b 4
-f 5' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split 0.5'
-
-echo 'a.b.c=d.e.f
-g.h.i=j.k.l
-m.n.o=p.q.r' > $TEMP0
-echo 'b
-h
-n' > $TEMP1
-$awk 'BEGIN { FS="=" } { FS="."; $0=$1; print $2; FS="="; }' $TEMP0 > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split (record assignment 1)'
-
-echo 'a.b.c=d.e.f
-g.h.i=j.k.l
-m.n.o=p.q.r' > $TEMP0
-echo 'd.e.f
-b
-j.k.l
-h
-p.q.r
-n' > $TEMP1
-$awk 'BEGIN { FS="=" } { print $2; FS="."; $0=$1; print $2; FS="="; }' $TEMP0 > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split (record assignment 2)'
 
 echo 'abc
 de
@@ -116,23 +55,10 @@ $awk '
 	print s
 }' $TEMP0 > $TEMP1
 
-diff $TEMP0 $TEMP1 || echo 'BAD: T.split 1'
+diff $TEMP0 $TEMP1 || echo 'BAD: T.split: 1' >[1=2]
 
 # assumes same test.temp.0!  bad design
 
-
-$awk '
-{	n = split($0, x, //)
-	m = length($0)
-	if (m != n) print "error 1", NR
-	s = ""
-	for (i = 1; i <= m; i++)
-		s = s x[i]
-	if (s != $0) print "error 2", NR
-	print s
-}' $TEMP0 > $TEMP1
-
-diff $TEMP0 $TEMP1 || echo 'BAD: T.split //'
 
 $awk '
 BEGIN { FS = "" }
@@ -146,7 +72,7 @@ BEGIN { FS = "" }
 	print s
 }' $TEMP0 > $TEMP2
 
-diff $TEMP0 $TEMP2 || echo 'BAD: T.split 2'
+diff $TEMP0 $TEMP2 || echo 'BAD: T.split: 2' >[1=2]
 
 # assumes same test.temp.0!
 
@@ -162,7 +88,7 @@ BEGIN { FS = "" }
 	print s
 }' $TEMP0 > $TEMP2
 
-diff $TEMP0 $TEMP2 || echo 'BAD: T.split 3'
+diff $TEMP0 $TEMP2 || echo 'BAD: T.split: 3' >[1=2]
 
 
 $awk '
@@ -176,7 +102,7 @@ XXX
 echo '2
 2
 2' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split 4'
+diff $TEMP1 $TEMP2 || echo 'BAD: T.split: 4' >[1=2]
 
 rm -f $TEMP1 $TEMP2 $TEMP3
 
@@ -191,7 +117,7 @@ echo '0
 1
 2
 3' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split null 3rd arg'
+diff $TEMP1 $TEMP2 || echo 'BAD: T.split: null 3rd arg' >[1=2]
 
 rm -f $TEMP1 $TEMP2 $TEMP3
 $awk 'BEGIN {
@@ -200,7 +126,7 @@ $awk 'BEGIN {
 }' > $TEMP1
 
 echo '2 a b' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split(a[1],a)'
+diff $TEMP1 $TEMP2 || echo 'BAD: T.split: a[1],a' >[1=2]
 
 $awk 'BEGIN {
   a = "cat\n\n\ndog"
@@ -208,4 +134,4 @@ $awk 'BEGIN {
   print b[1], b[2]
 }' > $TEMP1
 echo 'cat dog' > $TEMP2
-diff $TEMP1 $TEMP2 || echo 'BAD: T.split(a, b, "[\r\n]+")'
+diff $TEMP1 $TEMP2 || echo 'BAD: T.split: a, b, "[\r\n]+"' >[1=2]

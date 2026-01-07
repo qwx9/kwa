@@ -1,8 +1,8 @@
 #!/bin/rc
-echo T.lilly: miscellaneous RE tests from Bruce Lilly
+echo T.lilly: miscellaneous RE tests from Bruce Lilly >[1=2]
 
 rm -f foo
-$oldawk '
+awk '
 BEGIN { awk = ENVIRON["oldawk"] }
 /./ {
 	print $0 >"foo"
@@ -12,7 +12,7 @@ BEGIN { awk = ENVIRON["oldawk"] }
 }' <lilly.progs >foo1 >[2=1]
 
 rm -f foo
-$awk '
+awk '
 BEGIN { awk = ENVIRON["awk"] }
 /./ {
 	print $0 >"foo"
@@ -25,4 +25,4 @@ echo `{cat lilly.progs | wc -l} tests
 
 sed -e 's#'^$oldawk^':##' -e 's/Syntax/syntax/' -e '/warning:/d' foo1 >foo.glop1
 sed 's#'^$awk^':##' foo2 >foo.glop2
-diff foo.glop1 foo.glop2 >foo.lilly.diff || echo 'BAD: check foo.lilly.diff'
+diff foo.glop1 foo.glop2 >foo.lilly.diff || echo 'BAD: check foo.lilly.diff' >[1=2]

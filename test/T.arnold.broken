@@ -7,8 +7,11 @@ tar xf arnold-fixes.tar
 cd arnold-fixes
 
 files=(\
-	string-conv.awk\
-	system-status.awk\
+	a-format.awk\
+	decr-NF.awk\
+	ofs-rebuild.awk\
+	space.awk\
+	unary-plus.awk\
 )
 
 for(i in $files){

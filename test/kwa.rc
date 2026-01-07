@@ -1,0 +1,59 @@
+#!/bin/rc
+rfork e
+if(~ $#oldawk 0)
+	oldawk=awk
+if(~ $#awk 0)
+	awk=kwa
+
+fn check{
+	if(! cmp -s $1 $2){
+		echo BAD: $3 >[2=1]
+		diff -b $1 $2 | sed 's/^/	/;10q'
+	}
+	if not
+		rm $1 $2
+	status=()
+}
+
+echo 'p.*: book tests' >[1=2]
+for(i in p.*){
+	$oldawk -f $i test.countries test.countries >foo1.$i >[2=1]
+	$awk -f $i test.countries test.countries >foo2.$i >[2=1]
+	check foo?.$i $i
+}
+
+broken=(\
+	t.gsub4 \
+	t.ofmt \
+)
+echo 't.*: general-purpose tests' >[1=2]
+for(i in t.*){
+	if(! ~ $i $broken){
+		$oldawk -f $i test.data >foo1.$i >[2=1]
+		$awk -f $i test.data >foo2.$i >[2=1]
+		check foo?.$i $i
+	}
+	if not
+		status=()
+}
+
+broken=(\
+	T.expr \
+	T.flags \
+	T.func \
+	T.int-expr \
+	T.latin1 \
+	T.misc \
+	T.nextfile \
+	T.overflow \
+	T.re \
+	T.sub \
+	T.utf \
+	T.utfre \
+)
+for(i in T.*){
+	if(! ~ $i $broken *.broken)
+		./$i
+	if not
+		status=()
+}

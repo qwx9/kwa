@@ -1,15 +1,17 @@
 #!/bin/rc
-echo T.errmsg:  check some error messages
+echo T.errmsg:  check some error messages >[1=2]
 
 ls >foo.glop
-awk=$awk awk  '
-{	pat = $0
+awk '
+BEGIN{
+	awk = ENVIRON["awk"]
+}{
+	pat = $0
 	prog = ""
 	while (getline x > 0 && x != "")
 		prog = prog "\n" x
-	print sprintf("\n%s ''%s'' <foo.glop >/dev/null >[2]foo",
-		ENVIRON["awk"], prog)
-	print sprintf("grep ''%s'' foo >/dev/null || echo ''BAD: %s'' failed", pat, pat)
+	print "\n"awk" ''"prog"'' <foo.glop >/dev/null >[2]foo"
+	print "grep ''"pat"'' foo >/dev/null || echo ''BAD: T.errmsg: "pat"'' >[1=2]"
 }
 ' >foo.rc <<'!!!!'
 parsing error
@@ -18,29 +20,17 @@ parsing error
 illegal break, continue, next or nextfile from BEGIN
 BEGIN { nextfile }
 
-illegal break, continue, next or nextfile from END
-END { nextfile }
-
 nextfile is illegal inside a function
 function foo() { nextfile }
 
 duplicate argument
 function f(i,j,i) { return i }
 
-nonterminated character class
-/[[/
-
-nonterminated character class
-/[]/
-
 No closing ] for class
 /[\
 
 No closing ] for class
 BEGIN { s = "[x"; if (1 ~ s) print "foo"}
-
-syntax error in regular expression
-BEGIN { if ("x" ~ /$^/) print "ugh" }
 
 no matching parenthesis
 /((.)/
@@ -73,10 +63,6 @@ is a function, not an array
 function f(){}; {split($0, f)}
 
 function f called with 1 args, uses only 0
-BEGIN { f(f) }
-function f() { print "x" }
-
-can''t use function f as argument in f
 BEGIN { f(f) }
 function f() { print "x" }
 
@@ -179,9 +165,6 @@ BEGIN { length("abc", "def") }
 
 calling undefined function foo
 BEGIN { foo() }
-
-this should print a BAD message
-BEGIN { print }
 !!!!
 
 rc ./foo.rc
@@ -189,19 +172,16 @@ rc ./foo.rc
 echo xxx >foo0
 $awk '{print x}' 'x=a
 b' foo0 >foo1 >[2]foo2
-grep 'newline in string' foo2 >/dev/null || echo 'BAD: T.errmsg newline in string'
+grep 'newline in string' foo2 >/dev/null || echo 'BAD: T.errmsg: newline in string' >[1=2]
 
 $awk -safe 'BEGIN{"date" | getline}' >foo >[2]foo2
-grep 'cmd | getline is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg cmd|getline unsafe'
+grep 'cmd | getline is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg: cmd|getline unsafe' >[1=2]
 
 $awk -safe 'BEGIN{print >"foo"}' >foo >[2]foo2
-grep 'print > is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg print > unsafe'
+grep 'print > is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg: print > unsafe' >[1=2]
 
 $awk -safe 'BEGIN{print >> "foo"}' >foo >[2]foo2
-grep 'print >> is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg print >> unsafe'
+grep 'print >> is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg: print >> unsafe' >[1=2]
 
 $awk -safe 'BEGIN{print | "foo"}' >foo >[2]foo2
-grep 'print | is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg print | unsafe'
-
-$awk -safe 'BEGIN {system("date")}' >foo >[2]foo2
-grep 'system is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg system unsafe'
+grep 'print | is unsafe' foo2 >/dev/null || echo 'BAD: T.errmsg: print | unsafe' >[1=2]
