@@ -34,8 +34,6 @@ for(i in t.*){
 }
 
 broken=(\
-	T.expr \
-	T.flags \
 	T.func \
 	T.int-expr \
 	T.latin1 \
