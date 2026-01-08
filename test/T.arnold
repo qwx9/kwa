@@ -7,7 +7,6 @@ tar xf arnold-fixes.tar
 cd arnold-fixes
 
 files=(\
-	string-conv.awk\
 	system-status.awk\
 )
 

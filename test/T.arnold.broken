@@ -11,6 +11,7 @@ files=(\
 	decr-NF.awk\
 	ofs-rebuild.awk\
 	space.awk\
+	string-conv.awk\
 	unary-plus.awk\
 )
 

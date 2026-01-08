@@ -34,11 +34,6 @@ for(i in t.*){
 }
 
 broken=(\
-	T.func \
-	T.int-expr \
-	T.latin1 \
-	T.misc \
-	T.nextfile \
 	T.re \
 	T.sub \
 	T.utf \

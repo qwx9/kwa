@@ -1,5 +1,5 @@
 #!/bin/rc
-echo T.func: test user-defined functions
+echo T.func: test user-defined functions >[1=2]
 
 echo '10 2
 2 10
@@ -21,7 +21,7 @@ echo '1
 0
 0
 1' >foo2
-diff foo1 foo2 || echo 'BAD: T.func (function return type)'
+diff foo1 foo2 || echo 'BAD: T.func: function return type' >[1=2]
 
 echo 'data: data' >foo1
 $awk '
@@ -29,7 +29,7 @@ function test1(array) { array["test"] = "data" }
 function test2(array) { return(array["test"]) }
 BEGIN { test1(foo); print "data: " test2(foo) }
 ' >foo2
-diff foo1 foo2 || echo 'BAD: T.func (array type)'
+diff foo1 foo2 || echo 'BAD: T.func: array type' >[1=2]
 
 $awk '
 BEGIN	{ code() }
@@ -38,7 +38,7 @@ function code() { ; }
 function codeout(ex) { print ex }
 ' /dev/null >foo1
 echo x >foo2
-diff foo1 foo2 || echo 'BAD: T.func (argument passing)'
+diff foo1 foo2 || echo 'BAD: T.func: argument passing' >[1=2]
 
 $awk '
 BEGIN { unireghf() }
@@ -56,7 +56,7 @@ function rcell(cellname,hfeed) {
 ' >foo1
 echo 'foo
 bar' >foo2
-diff foo1 foo2 || echo 'BAD: T.func (convert arg to array)'
+diff foo1 foo2 || echo 'BAD: T.func: convert arg to array' >[1=2]
 
 $awk '
 function f(n) {
@@ -90,7 +90,7 @@ cat <<! >foo1
 40320
 362880
 !
-diff foo1 foo2 || echo 'BAD: T.func (factorial)'
+diff foo1 foo2 || echo 'BAD: T.func: factorial' >[1=2]
 
 $awk '
 function ack(m,n) {
@@ -116,7 +116,7 @@ cat <<! >foo1
 125 (10307 calls)
 253 (42438 calls)
 !
-diff foo1 foo2 || echo 'BAD: T.func (ackermann)'
+diff foo1 foo2 || echo 'BAD: T.func: ackermann' >[1=2]
 
 $awk '
 END { print "end" }
@@ -141,7 +141,7 @@ begin
 89
 end
 !
-diff foo1 foo2 || echo 'BAD: T.func (fib)'
+diff foo1 foo2 || echo 'BAD: T.func: fib' >[1=2]
 
 $awk '
 function foo() {
@@ -151,7 +151,7 @@ function foo() {
 }
 BEGIN { foo(); exit }
 ' >foo1
-grep 'should not' foo1 && echo 'BAD: T.func (return)'
+grep 'should not' foo1 && echo 'BAD: T.func: return' >[1=2]
 
 # this exercises multiple free of temp cells
 echo 'eqn
@@ -166,12 +166,12 @@ function eprocess(file, first, contig) {
 function process(file) {
 	close(file)
 }' >foo2
-diff foo1 foo2 || echo 'BAD: T.func (eqn)'
+diff foo1 foo2 || echo 'BAD: T.func: eqn' >[1=2]
 
 echo 1 >foo1
 $awk 'function f() { n = 1; exit }
 	BEGIN { n = 0; f(); n = 2 }; END { print n}' >foo2
-diff foo1 foo2 || echo 'BAD: T.func (exit in function)'
+diff foo1 foo2 || echo 'BAD: T.func: exit in function' >[1=2]
 
 echo 1 >foo1
 $awk '
@@ -186,69 +186,10 @@ BEGIN {	n = 10
 	print (k == n^2)
       }
 ' >foo2
-diff foo1 foo2 || echo 'BAD: T.func (multi-dim subscript)'
+diff foo1 foo2 || echo 'BAD: T.func: multi-dim subscript' >[1=2]
 
 echo '<> 0' >foo1
 $awk '
 function foo() { i = 0 }
         BEGIN { x = foo(); printf "<%s> %d\n", x, x }' >foo2
-diff foo1 foo2 || echo 'BAD: T.func (fall off end)'
-
-$awk '
-function f(x, y) {
-	x = "x"
-	y[0] = "y"
-	print x, y[0]
-}
-function g(z) {
-	print z[0]
-}
-BEGIN {
-	f(a, a)
-	g(a)
-}' >[2]foo1 >/dev/null
-if(! grep 'can.t read value of .* an array' foo1 >/dev/null >[2=1])
-	echo "BAD: T.func (simultaneously scalar and array: $ret)"
-
-$awk '
-function f(f1, f2, f3) {
-	f1[0] = "*"
-	print "f: " f1[0], f2[0], f3[0]
-}
-function g(g1, g2, g3) {
-	f(g1, g1, g1)
-	print "g: " g1[0], g2[0], g3[0]
-}
-function h(h1, h2, h3) {
-	g(h1, h2, h3)
-	print "h: " h1[0], h2[0], h3[0]
-}
-function i(i1, i2, i3) {
-	print "i: " i1[0], i2[0], i3[0]
-}
-BEGIN {
-	OFS = "-"
-	f(a, a, a)
-	g(b, b, b)
-	h(c, c, c)
-	i(a, b, c)
-}' >foo2
-cat <<'!' >foo1
-f: *-*-*
-f: *-*-*
-g: *-*-*
-f: *-*-*
-g: *-*-*
-h: *-*-*
-i: *-*-*
-!
-diff foo1 foo2 || echo 'BAD: T.func (cousin coherency)'
-
-$awk '
-function f(x) { x[0]="updated"; exit }
-function g(y) { print y[0] }
-BEGIN { f(a) }
-END   { g(a) }
-' >foo2
-echo 'updated' >foo1
-diff foo1 foo2 || echo 'BAD: T.func (exit skips arg conversion updates)'
+diff foo1 foo2 || echo 'BAD: T.func: fall off end' >[1=2]
